@@ -1,0 +1,171 @@
+
+
+<h2>Lista de Estudiantes</h2>
+
+<div *ngIf="message.length > 0" class="alert alert-secondary" role="alert">
+  {{message}}
+</div>
+
+<div *ngIf="listStudents.length == 0" class="alert alert-primary" role="alert">
+  There aren't students
+</div>
+
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Nombre</th>
+      <th scope="col">Apellido</th>
+      <th scope="col">Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let student of listStudents">
+      <th scope="row">{{student.id}}</th>
+      <td>{{ student.givenName }}</td>
+      <td>{{ student.surname }}</td>
+      <td>{{ student.email }}</td>
+      <td> <button (click)="deleteStudent(student.id)" title="Delete Student"> <i class="fa-solid fa-trash-can"></i></button></td>
+      <td> <button (click)="findAllLectures(student.id!=null?student.id: 0)" data-bs-toggle="modal" data-bs-target="#ListaLecturesModal" title="show Lectures">
+              <i class="fa-solid fa-book-medical"></i>
+            </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="btn-group" role="group">
+  <div>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentModal">
+      Add Student
+    </button>
+  </div>
+
+  <div>
+    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#LectureModal">Add Lecture</button>
+  </div>
+</div>
+
+
+<div class="modal fade" id="ListaLecturesModal" tabindex="-1" aria-labelledby="ListaLecturesModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="ListaLecturesModalLabel">List available Lectures</h1>
+        <button type="button"  class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <form >
+          <div *ngFor="let lecture of listLectures">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" [id]="'lecture-' + lecture.id" [checked]="false" (change)="toggleSelection(lecture.id)">
+              <label class="form-check-label" [for]="'lecture-' + lecture.id">
+                {{ lecture.name }}
+              </label>
+            </div>
+          </div>
+
+          <br>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" (click)="saveLecturesSelected()" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="LectureModal" tabindex="-1" aria-labelledby="LectureModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="LectureModalLabel">New Lecture</h1>
+        <button type="button" #closebutton class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <form [formGroup]="checkoutFormLecture" class="row needs-validation" novalidate  (ngSubmit)="saveLecture()">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" formControlName="name" class="form-control" id="name" placeholder="Philosophy" required>
+            <div class="invalid-feedback">Name is required.</div>
+          </div>
+          <div>
+            <br>
+            <button type="submit"  class="btn btn-primary">Save Lecture</button>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="studentModalLabel">New Student</h1>
+        <button type="button" #closebutton class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <form [formGroup]="checkoutForm" class="row needs-validation" novalidate  (ngSubmit)="saveStudent()">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" formControlName="name" class="form-control" id="name" placeholder="john" required>
+            <div class="invalid-feedback">Name is required.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="surname">Surname</label>
+            <input type="text" formControlName="surname" class="form-control" id="surname" placeholder="doe" required>
+            <div class="invalid-feedback">Surname is required.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" formControlName="email" required class="form-control" id="email" placeholder="name@example.com">
+            <div class="invalid-feedback">Email is required.</div>
+          </div>
+          <div>
+            <br>
+            <button type="submit"  class="btn btn-primary">Save Student</button>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (() => {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Boots
+  const forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
